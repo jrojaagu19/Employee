@@ -9,5 +9,12 @@ public class DataContext : DbContext
     {
     }
 
-    public DbSet<Employee> Employees { get; set; } = null!;
+    public DbSet<Employee> Employees { get; set; }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
+        modelBuilder.Entity<Employee>().HasIndex(x => x.FirstName);
+        modelBuilder.Entity<Employee>().Property(x => x.Salary).HasColumnType("decimal(18,2)");
+    }
 }

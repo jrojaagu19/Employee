@@ -1,8 +1,8 @@
 ﻿using Employees.Shared.Responses;
 
-namespace Employees.Backend.Repositories.Interfaces;
+namespace Employees.Backend.UnitsOfWork.Interfaces;
 
-public interface IGenericRepository<T> where T : class
+public interface IGenericUnitOfWork<T> where T : class
 {
     Task<ActionResponse<T>> GetAsync(int id);
 
