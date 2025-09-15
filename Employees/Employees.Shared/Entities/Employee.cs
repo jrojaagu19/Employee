@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Employees.Shared.Entities;
 
@@ -24,5 +25,6 @@ public class Employee
 
     [Display(Name = "Salario")]
     [Range(1000000, double.MaxValue, ErrorMessage = "El salario debe ser mínimo $1,000,000.")]
+    [Column(TypeName = "decimal(18,2)")]
     public decimal Salary { get; set; }
 }
