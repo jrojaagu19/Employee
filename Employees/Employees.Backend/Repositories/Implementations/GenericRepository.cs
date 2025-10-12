@@ -94,15 +94,23 @@ public class GenericRepository<T> : IGenericRepository<T> where T : class
             };
         }
 
-        var entities = await _context.Set<T>().Where(x =>
-            EF.Functions.Like(EF.Property<string>(x, "FirstName"), $"%{query}%") ||
-            EF.Functions.Like(EF.Property<string>(x, "LastName"), $"%{query}%")).ToListAsync();
+        // Normalizar el término de búsqueda
+        var searchTerm = query.Trim();
+
+        // Buscar solo al INICIO y ordenar en la misma consulta SQL
+        var entities = await _context.Set<T>()
+            .Where(x =>
+            EF.Functions.Like(EF.Property<string>(x, "FirstName"), $"{searchTerm}%") ||
+            EF.Functions.Like(EF.Property<string>(x, "LastName"), $"{searchTerm}%"))
+            .OrderBy(x => EF.Property<string>(x, "LastName"))
+            .ThenBy(x => EF.Property<string>(x, "FirstName"))
+            .ToListAsync();
 
         if (!entities.Any())
         {
             return new ActionResponse<IEnumerable<T>>
             {
-                Message = "No exiten registros con este criterio."
+                Message = "No existen registros con este criterio."
             };
         }
 

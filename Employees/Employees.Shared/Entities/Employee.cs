@@ -1,9 +1,10 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Employees.Shared.Interfaces;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Employees.Shared.Entities;
 
-public class Employee
+public class Employee : IEntityWithName
 {
     public int Id { get; set; }
 
