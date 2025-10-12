@@ -94,10 +94,8 @@ public class GenericRepository<T> : IGenericRepository<T> where T : class
             };
         }
 
-        // Normalizar el término de búsqueda
         var searchTerm = query.Trim();
 
-        // Buscar solo al INICIO y ordenar en la misma consulta SQL
         var entities = await _context.Set<T>()
             .Where(x =>
             EF.Functions.Like(EF.Property<string>(x, "FirstName"), $"{searchTerm}%") ||

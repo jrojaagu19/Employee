@@ -31,7 +31,7 @@ public class GenericController<T> : Controller where T : class
         {
             return Ok(action.Result);
         }
-        return NotFound();
+        return NotFound(new { message = action.Message });
     }
 
     [HttpGet("search")]
