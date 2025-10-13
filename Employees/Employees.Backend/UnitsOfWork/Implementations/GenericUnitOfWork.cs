@@ -14,11 +14,9 @@ public class GenericUnitOfWork<T> : IGenericUnitOfWork<T> where T : class
         _repository = repository;
     }
 
-    public virtual async Task<ActionResponse<IEnumerable<T>>> GetAsync(PaginationDTO pagination) => await
-        _repository.GetAsync(pagination);
+    public virtual async Task<ActionResponse<IEnumerable<T>>> GetAsync(PaginationDTO pagination) => await _repository.GetAsync(pagination);
 
-    public virtual async Task<ActionResponse<int>> GetTotalRecordsAsync(PaginationDTO pagination) => await
-        _repository.GetTotalRecordsAsync(pagination);
+    public virtual async Task<ActionResponse<int>> GetTotalRecordsAsync(PaginationDTO pagination) => await _repository.GetTotalRecordsAsync(pagination);
 
     public virtual async Task<ActionResponse<T>> AddAsync(T entity) => await _repository.AddAsync(entity);
 

@@ -1,4 +1,5 @@
 ﻿using Employees.Shared.DTOs;
+using Employees.Shared.Entities;
 using Employees.Shared.Responses;
 
 namespace Employees.Backend.UnitsOfWork.Interfaces;
