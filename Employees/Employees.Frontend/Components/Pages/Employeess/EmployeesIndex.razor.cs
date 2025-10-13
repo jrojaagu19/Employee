@@ -2,7 +2,8 @@ using Employees.Frontend.Repositories;
 using Employees.Shared.Entities;
 using Microsoft.AspNetCore.Components;
 
-namespace Employees.Frontend.Components.Pages.Employees
+namespace Employees.Frontend.Components.Pages.Employeess
+
 {
     public partial class EmployeesIndex
     {
@@ -12,6 +13,7 @@ namespace Employees.Frontend.Components.Pages.Employees
         protected override async Task OnInitializedAsync()
         {
             var httpResult = await Repository.GetAsync<List<Employee>>("api/employees");
+            Thread.Sleep(3000);
             employees = httpResult.Response;
         }
     }

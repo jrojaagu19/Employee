@@ -1,10 +1,12 @@
 ﻿@page "/employees"
 
+
+
 <h3>Empleados</h3>
 
 @if ( employees == null)
 {
-    <p>Cargando. . .</p>
+    <Loading Label="Cargando Empleados por favor espera . . ."/>
 }
 else
 {
