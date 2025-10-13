@@ -1,3 +1,72 @@
-﻿<h3>EmployeeEdit</h3>
+﻿@page "/employees/edit/{Id:int}"
+@using Employees.Shared.Entities
 
+<MudText Typo="Typo.h4" Class="mb-4">Editar Empleado</MudText>
 
+@if (employee is null)
+{
+    <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
+}
+else
+{
+    <MudCard>
+        <MudCardContent>
+            <MudForm @ref="form" Model="@employee">
+                <MudTextField @bind-Value="employee.FirstName"
+                              Label="Nombre"
+                              Required="true"
+                              RequiredError="El nombre es requerido"
+                              MaxLength="50"
+                              Counter="50"
+                              Variant="Variant.Outlined" />
+
+                <MudTextField @bind-Value="employee.LastName"
+                              Label="Apellido"
+                              Required="true"
+                              RequiredError="El apellido es requerido"
+                              MaxLength="50"
+                              Counter="50"
+                              Variant="Variant.Outlined"
+                              Class="mt-3" />
+
+                <MudNumericField @bind-Value="employee.Salary"
+                                 Label="Salario"
+                                 Required="true"
+                                 RequiredError="El salario es requerido"
+                                 Min="1000000"
+                                 Format="N0"
+                                 Variant="Variant.Outlined"
+                                 Class="mt-3" />
+
+                <MudDatePicker @bind-Date="employee.HireDate"
+                               Label="Fecha de Contratación"
+                               Variant="Variant.Outlined"
+                               Class="mt-3" />
+
+                <MudSwitch @bind-Value="employee.IsActive"
+                           Label="Activo"
+                           Color="Color.Primary"
+                           Class="mt-3" />
+            </MudForm>
+        </MudCardContent>
+
+        <MudCardActions>
+            <MudButton Variant="Variant.Filled"
+                       Color="Color.Primary"
+                       OnClick="EditAsync"
+                       StartIcon="@Icons.Material.Filled.Save">
+                Guardar Cambios
+            </MudButton>
+            <MudButton Variant="Variant.Outlined"
+                       Color="Color.Secondary"
+                       OnClick="Return"
+                       StartIcon="@Icons.Material.Filled.Cancel">
+                Cancelar
+            </MudButton>
+        </MudCardActions>
+    </MudCard>
+}
+
+@code {
+    private MudForm form = null!;
+}
