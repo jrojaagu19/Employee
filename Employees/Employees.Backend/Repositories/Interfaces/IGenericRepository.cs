@@ -5,15 +5,15 @@ namespace Employees.Backend.Repositories.Interfaces;
 
 public interface IGenericRepository<T> where T : class
 {
+    Task<ActionResponse<T>> GetAsync(int id);
+
+    Task<ActionResponse<IEnumerable<T>>> GetAsync();
+
     Task<ActionResponse<IEnumerable<T>>> GetAsync(PaginationDTO pagination);
 
     Task<ActionResponse<int>> GetTotalRecordsAsync(PaginationDTO pagination);
 
-    Task<ActionResponse<T>> GetAsync(int id);
-
     Task<ActionResponse<IEnumerable<T>>> SearchAsync(string query);
-
-    Task<ActionResponse<IEnumerable<T>>> GetAsync();
 
     Task<ActionResponse<T>> AddAsync(T entity);
 

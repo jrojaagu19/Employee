@@ -14,25 +14,25 @@ public class GenericController<T> : Controller where T : class
     }
 
     [HttpGet("paginated")]
-    public virtual async Task<IActionResult> GetAsync([FromQuery] PaginationDTO pagination)
+    public async Task<IActionResult> GetPaginatedAsync([FromQuery] PaginationDTO pagination)
     {
         var action = await _unitOfWork.GetAsync(pagination);
         if (action.WasSuccess)
         {
             return Ok(action.Result);
         }
-        return BadRequest();
+        return BadRequest(action.Message);
     }
 
     [HttpGet("totalRecords")]
-    public virtual async Task<IActionResult> GetTotalRecordsAsync([FromQuery] PaginationDTO pagination)
+    public async Task<IActionResult> GetTotalRecordsAsync([FromQuery] PaginationDTO pagination)
     {
         var action = await _unitOfWork.GetTotalRecordsAsync(pagination);
         if (action.WasSuccess)
         {
             return Ok(action.Result);
         }
-        return BadRequest();
+        return BadRequest(action.Message);
     }
 
     [HttpGet]

@@ -1,0 +1,53 @@
+﻿@using Employees.Shared.Entities
+
+
+<EditForm EditContext="editContext" OnValidSubmit="OnValidSubmit">
+    <DataAnnotationsValidator />
+
+    <MudTextField Label="Nombre"
+                  @bind-Value="@Employee.FirstName"
+                  For="@(() => Employee.FirstName)"
+                  Class="mb-4" />
+
+    <MudTextField Label="Apellido"
+                  @bind-Value="@Employee.LastName"
+                  For="@(() => Employee.LastName)"
+                  Class="mb-4" />
+
+    <MudDatePicker Label="Fecha de contratación"
+                   @bind-Date="@Employee.HireDate"
+                   For="@(() => Employee.HireDate)"
+                   Class="mb-4" />
+
+    <MudNumericField T="decimal"
+                     Label="Salario"
+                     @bind-Value="@Employee.Salary"
+                     For="@(() => Employee.Salary)"
+                     Adornment="Adornment.Start"
+                     AdornmentIcon="@Icons.Material.Filled.AttachMoney"
+                     Class="mb-4" />
+
+    <MudSwitch T="bool"
+               @bind-Checked="@Employee.IsActive"
+               Color="Color.Primary"
+               Label="Activo"
+               Class="mb-4" />
+
+
+    <div class="d-flex justify-content-end mt-4">
+        <MudButton Variant="Variant.Outlined"
+                   StartIcon="@Icons.Material.Filled.ArrowBack"
+                   Color="Color.Info"
+                   OnClick="ReturnAction"
+                   Class="me-2">
+            Cancelar
+        </MudButton>
+
+        <MudButton Variant="Variant.Filled"
+                   StartIcon="@Icons.Material.Filled.Check"
+                   Color="Color.Primary"
+                   ButtonType="ButtonType.Submit">
+            Guardar Cambios
+        </MudButton>
+    </div>
+</EditForm>
