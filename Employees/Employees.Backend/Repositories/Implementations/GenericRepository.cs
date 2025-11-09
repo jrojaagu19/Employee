@@ -18,6 +18,30 @@ public class GenericRepository<T> : IGenericRepository<T> where T : class
         _entity = _context.Set<T>();
     }
 
+    public virtual async Task<ActionResponse<IEnumerable<T>>> GetAsync(PaginationDTO pagination)
+    {
+        var queryable = _entity.AsQueryable();
+
+        return new ActionResponse<IEnumerable<T>>
+        {
+            WasSuccess = true,
+            Result = await queryable
+                .Paginate(pagination)
+                .ToListAsync()
+        };
+    }
+
+    public virtual async Task<ActionResponse<int>> GetTotalRecordsAsync(PaginationDTO pagination)
+    {
+        var queryable = _entity.AsQueryable();
+        double count = await queryable.CountAsync();
+        return new ActionResponse<int>
+        {
+            WasSuccess = true,
+            Result = (int)count
+        };
+    }
+
     public virtual async Task<ActionResponse<T>> AddAsync(T entity)
     {
         _context.Add(entity);
@@ -47,26 +71,15 @@ public class GenericRepository<T> : IGenericRepository<T> where T : class
         {
             return new ActionResponse<T>
             {
-                Message = "No se encontró el registro."
+                Message = "No se encontro el registro."
             };
         }
         _entity.Remove(row);
-
-        try
+        await _context.SaveChangesAsync();
+        return new ActionResponse<T>
         {
-            await _context.SaveChangesAsync();
-            return new ActionResponse<T>
-            {
-                WasSuccess = true,
-            };
-        }
-        catch
-        {
-            return new ActionResponse<T>
-            {
-                Message = "No se puede borrar porque tiene registros relacionados."
-            };
-        }
+            WasSuccess = true,
+        };
     }
 
     public virtual async Task<ActionResponse<T>> GetAsync(int id)
@@ -76,47 +89,13 @@ public class GenericRepository<T> : IGenericRepository<T> where T : class
         {
             return new ActionResponse<T>
             {
-                Message = "No se encontró el registro."
+                Message = "No se encontro el registro."
             };
         }
         return new ActionResponse<T>
         {
             WasSuccess = true,
             Result = row
-        };
-    }
-
-    public virtual async Task<ActionResponse<IEnumerable<T>>> GetAsync()
-    {
-        return new ActionResponse<IEnumerable<T>>
-        {
-            WasSuccess = true,
-            Result = await _entity.ToListAsync()
-        };
-    }
-
-    public virtual async Task<ActionResponse<IEnumerable<T>>> GetAsync(PaginationDTO pagination)
-    {
-        var queryable = _entity.AsQueryable();
-
-        return new ActionResponse<IEnumerable<T>>
-        {
-            WasSuccess = true,
-            Result = await queryable
-                .Paginate(pagination)
-                .ToListAsync()
-        };
-    }
-
-    public virtual async Task<ActionResponse<int>> GetTotalRecordsAsync(PaginationDTO pagination)
-    {
-        var queryable = _entity.AsQueryable();
-        double count = await queryable.CountAsync();
-
-        return new ActionResponse<int>
-        {
-            WasSuccess = true,
-            Result = (int)count
         };
     }
 
@@ -130,21 +109,15 @@ public class GenericRepository<T> : IGenericRepository<T> where T : class
             };
         }
 
-        var searchTerm = query.Trim();
-
-        var entities = await _context.Set<T>()
-            .Where(x =>
-                EF.Functions.Like(EF.Property<string>(x, "FirstName"), $"{searchTerm}%") ||
-                EF.Functions.Like(EF.Property<string>(x, "LastName"), $"{searchTerm}%"))
-            .OrderBy(x => EF.Property<string>(x, "LastName"))
-            .ThenBy(x => EF.Property<string>(x, "FirstName"))
-            .ToListAsync();
+        var entities = await _context.Set<T>().Where(x =>
+            EF.Functions.Like(EF.Property<string>(x, "Name"), $"%{query}%") ||
+            EF.Functions.Like(EF.Property<string>(x, "LastName"), $"%{query}%")).ToListAsync();
 
         if (!entities.Any())
         {
             return new ActionResponse<IEnumerable<T>>
             {
-                Message = "No existen registros con este criterio."
+                Message = "No exiten registros con este criterio."
             };
         }
 
@@ -154,6 +127,12 @@ public class GenericRepository<T> : IGenericRepository<T> where T : class
             Result = entities
         };
     }
+
+    public virtual async Task<ActionResponse<IEnumerable<T>>> GetAsync() => new ActionResponse<IEnumerable<T>>
+    {
+        WasSuccess = true,
+        Result = await _entity.ToListAsync()
+    };
 
     public virtual async Task<ActionResponse<T>> UpdateAsync(T entity)
     {
@@ -177,19 +156,13 @@ public class GenericRepository<T> : IGenericRepository<T> where T : class
         }
     }
 
-    private ActionResponse<T> ExceptionActionResponse(Exception exception)
+    private ActionResponse<T> ExceptionActionResponse(Exception exception) => new ActionResponse<T>
     {
-        return new ActionResponse<T>
-        {
-            Message = exception.Message
-        };
-    }
+        Message = exception.Message
+    };
 
     private ActionResponse<T> DbUpdateExceptionActionResponse()
     {
-        return new ActionResponse<T>
-        {
-            Message = "Ya existe el registro que está intentando crear."
-        };
+        throw new NotImplementedException();
     }
 }

@@ -1,49 +1,53 @@
-﻿using Company.Backend.Repositories.Interfaces;
-using Employees.Backend.Data;
+﻿using Employees.Backend.Data;
 using Employees.Backend.Helpers;
-using Employees.Backend.Repositories.Implementations;
+using Employees.Backend.Repositories.Interfaces;
 using Employees.Shared.DTOs;
 using Employees.Shared.Entities;
 using Employees.Shared.Responses;
 using Microsoft.EntityFrameworkCore;
 
-namespace Company.Backend.Repositories.Implementations;
+namespace Employees.Backend.Repositories.Implementations;
 
 public class EmployeeRepository : GenericRepository<Employee>, IEmployeeRepository
 {
-    private readonly DataContext _Context;
+    private readonly DataContext _context;
 
     public EmployeeRepository(DataContext context) : base(context)
     {
-        _Context = context;
+        _context = context;
     }
 
-    public override async Task<ActionResponse<Employee>> AddAsync(Employee entity)
+    public override async Task<ActionResponse<IEnumerable<Employee>>> GetAsync(PaginationDTO pagination)
     {
-        if (entity.HireDate == default)
+        var queryable = _context.Employees.AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(pagination.Filter))
         {
-            entity.HireDate = DateTime.Now;
+            queryable = queryable.Where(x =>
+                x.FirstName.ToLower().StartsWith(pagination.Filter.ToLower()) ||
+                x.LastName.ToLower().StartsWith(pagination.Filter.ToLower()));
         }
 
-        _Context.Employees.Add(entity);
-        await _Context.SaveChangesAsync();
-
-        return new ActionResponse<Employee>
+        return new ActionResponse<IEnumerable<Employee>>
         {
             WasSuccess = true,
-            Result = entity
+            Result = await queryable
+                .OrderBy(x => x.FirstName)
+                .ThenBy(x => x.LastName)
+                .Paginate(pagination)
+                .ToListAsync()
         };
     }
 
     public override async Task<ActionResponse<int>> GetTotalRecordsAsync(PaginationDTO pagination)
     {
-        var queryable = _Context.Employees.AsQueryable();
+        var queryable = _context.Employees.AsQueryable();
 
         if (!string.IsNullOrWhiteSpace(pagination.Filter))
         {
             queryable = queryable.Where(x =>
-            x.FirstName.Contains(pagination.Filter, StringComparison.CurrentCultureIgnoreCase) ||
-                x.LastName.Contains(pagination.Filter, StringComparison.CurrentCultureIgnoreCase));
+                x.FirstName.ToLower().StartsWith(pagination.Filter.ToLower()) ||
+                x.LastName.ToLower().StartsWith(pagination.Filter.ToLower()));
         }
 
         double count = await queryable.CountAsync();
@@ -54,59 +58,25 @@ public class EmployeeRepository : GenericRepository<Employee>, IEmployeeReposito
         };
     }
 
-    public override async Task<ActionResponse<IEnumerable<Employee>>> GetAsync(PaginationDTO pagination)
+    public override async Task<ActionResponse<IEnumerable<Employee>>> SearchAsync(string query)
     {
-        var queryable = _Context.Employees
-                 .AsQueryable();
+        var queryable = _context.Employees.AsQueryable();
 
-        if (!string.IsNullOrWhiteSpace(pagination.Filter))
+        if (!string.IsNullOrWhiteSpace(query))
         {
-            var filter = pagination.Filter.ToLower();
             queryable = queryable.Where(x =>
-                x.FirstName.Contains(pagination.Filter, StringComparison.CurrentCultureIgnoreCase) ||
-                x.LastName.Contains(pagination.Filter, StringComparison.CurrentCultureIgnoreCase));
+                x.FirstName.ToLower().StartsWith(query.ToLower()) ||
+                x.LastName.ToLower().StartsWith(query.ToLower()));
         }
 
         return new ActionResponse<IEnumerable<Employee>>
         {
             WasSuccess = true,
             Result = await queryable
-            .OrderBy(e => e.Id)
-            .ThenBy(e => e.FirstName)
-            .Paginate(pagination)
-            .ToListAsync()
+                .OrderBy(x => x.FirstName)
+                .ThenBy(x => x.LastName)
+                .Take(100)
+                .ToListAsync()
         };
-    }
-
-    public override async Task<ActionResponse<IEnumerable<Employee>>> SearchAsync(string query)
-    {
-        {
-            if (string.IsNullOrWhiteSpace(query))
-            {
-                return new ActionResponse<IEnumerable<Employee>>
-                {
-                    Message = "Debe ingresar un texto de búsqueda."
-                };
-            }
-
-            var entities = await _Context.Set<Employee>()
-                .Where(x => EF.Property<string>(x, "Name").Contains(query)
-                         || EF.Property<string>(x, "LastName").Contains(query))
-                .ToListAsync();
-
-            if (!entities.Any())
-            {
-                return new ActionResponse<IEnumerable<Employee>>
-                {
-                    Message = "No se encontraron registros con ese criterio."
-                };
-            }
-
-            return new ActionResponse<IEnumerable<Employee>>
-            {
-                WasSuccess = true,
-                Result = entities
-            };
-        }
     }
 }

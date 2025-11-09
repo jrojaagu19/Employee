@@ -2,9 +2,9 @@
 using Employees.Shared.Entities;
 using Employees.Shared.Responses;
 
-namespace Employees.Backend.Repositories.Interfaces;
+namespace Employees.Backend.UnitsOfWork.Interfaces;
 
-public interface IEmployeeRepository
+public interface IEmployeeUnitOfWork
 {
     Task<ActionResponse<IEnumerable<Employee>>> GetAsync(PaginationDTO pagination);
 

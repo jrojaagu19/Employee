@@ -4,18 +4,22 @@ using Employees.Backend.Repositories.Interfaces;
 using Employees.Backend.UnitsOfWork.Implementations;
 using Employees.Backend.UnitsOfWork.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers()
-    .AddJsonOptions(x => x.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles);
-builder.Services.AddControllers();
+    .AddJsonOptions(x => x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddDbContext<DataContext>(x => x.UseSqlServer("Name=LocalConnection"));
+builder.Services.AddDbContext<DataContext>(x => x.UseSqlServer("name = LocalConnection"));
+builder.Services.AddTransient<SeedDb>();
+
 builder.Services.AddScoped(typeof(IGenericUnitOfWork<>), typeof(GenericUnitOfWork<>));
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
-builder.Services.AddTransient<SeedDb>();
+
+builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
+builder.Services.AddScoped<IEmployeeUnitOfWork, EmployeeUnitOfWork>();
 
 var app = builder.Build();
 

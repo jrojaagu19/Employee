@@ -14,25 +14,25 @@ public class GenericController<T> : Controller where T : class
     }
 
     [HttpGet("paginated")]
-    public async Task<IActionResult> GetPaginatedAsync([FromQuery] PaginationDTO pagination)
+    public virtual async Task<IActionResult> GetAsync([FromQuery] PaginationDTO pagination)
     {
         var action = await _unitOfWork.GetAsync(pagination);
         if (action.WasSuccess)
         {
             return Ok(action.Result);
         }
-        return BadRequest(action.Message);
+        return BadRequest();
     }
 
     [HttpGet("totalRecords")]
-    public async Task<IActionResult> GetTotalRecordsAsync([FromQuery] PaginationDTO pagination)
+    public virtual async Task<IActionResult> GetTotalRecordsAsync([FromQuery] PaginationDTO pagination)
     {
         var action = await _unitOfWork.GetTotalRecordsAsync(pagination);
         if (action.WasSuccess)
         {
             return Ok(action.Result);
         }
-        return BadRequest(action.Message);
+        return BadRequest();
     }
 
     [HttpGet]
@@ -54,7 +54,7 @@ public class GenericController<T> : Controller where T : class
         {
             return Ok(action.Result);
         }
-        return NotFound(new { message = action.Message });
+        return NotFound(action.Message);
     }
 
     [HttpGet("search")]
@@ -64,7 +64,7 @@ public class GenericController<T> : Controller where T : class
         {
             return BadRequest(new
             {
-                message = "El campo de búsqueda es requerido."
+                message = "Este campo es requerido para la busqueda."
             });
         }
 

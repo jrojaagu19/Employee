@@ -1,87 +1,76 @@
 ﻿@page "/employees"
-
-@if (loading)
-{
-    <Loading />
-}
-else
-{
-    <MudTable Items="@Employees"
-              @ref="table"
-              ServerData="LoadListAsync"
-              Dense="true"
-              Hover="true"
-              Striped="true"
-              FixedHeader="true"
-              FixedFooter="true">
-
-        <ToolBarContent>
-            <div class="d-flex justify-content-between">
-                <MudText Typo="Typo.h6" Class="me-4">Empleados</MudText>
-                <MudButton Variant="Variant.Outlined"
-                           EndIcon="@Icons.Material.Filled.Add"
-                           Color="Color.Info"
-                           OnClick="@(() => ShowModalAsync())">
-                    Nuevo
-                </MudButton>
+<MudTable @ref="table"
+          ServerData="LoadListAsync"
+          Loading="@loading"
+          LoadingProgressColor="Color.Info"
+          Dense="true"
+          Hover="true"
+          Striped="true"
+          FixedHeader="true"
+          FixedFooter="true">
+    <ToolBarContent>
+        <div class="d-flex justify-content-between w-100">
+            <MudText Typo="Typo.h6" Class="me-4">Empleados</MudText>
+            <MudButton Variant="Variant.Outlined"
+                       EndIcon="@Icons.Material.Filled.Add"
+                       Color="Color.Info"
+                       OnClick="@(() => ShowModalAsync())">
+                Nuevo
+            </MudButton>
+        </div>
+        <MudSpacer />
+        <FilterComponent ApplyFilter="SetFilterValue" />
+    </ToolBarContent>
+    <HeaderContent>
+        <MudTh style="width: 20px;">Id</MudTh>
+        <MudTh>Nombre</MudTh>
+        <MudTh style="width: 270px;">Apellido</MudTh>
+        <MudTh style="width: 270px;">Salario</MudTh>
+        <MudTh style="width: 120px;">Estado</MudTh>
+        <MudTh style="width: 270px;">Acciones</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd>@context.Id</MudTd>
+        <MudTd>@context.FirstName</MudTd>
+        <MudTd>@context.LastName</MudTd>
+        <MudTd>@string.Format(new System.Globalization.CultureInfo("es-CO"), "{0:C0}", context.Salary)</MudTd>
+        <MudTd>
+            <div class="d-flex align-items-center">
+                <MudIcon Icon="@Icons.Material.Filled.Circle"
+                         Color="@(context.IsActive ? Color.Success : Color.Error)"
+                         Size="Size.Small" />
+                <MudText Inline="true" Class="ms-2">
+                    @(context.IsActive ? "Activo" : "Inactivo")
+                </MudText>
             </div>
-            <MudSpacer />
-            <FilterComponent ApplyFilter="SetFilterValue" />
-        </ToolBarContent>
-
-        <HeaderContent>
-            <MudTh>Nombre</MudTh>
-            <MudTh>Apellido</MudTh>
-            <MudTh>Activo</MudTh>
-            <MudTh>Fecha de Contratación</MudTh>
-            <MudTh>Salario</MudTh>
-            <MudTh style="width: 270px;">Acciones</MudTh>
-        </HeaderContent>
-
-        <RowTemplate>
-            <MudTd>@context.FirstName</MudTd>
-            <MudTd>@context.LastName</MudTd>
-            <MudTd>
-                @if (context.IsActive)
-                {
-                    <MudChip T="string" Color="Color.Success" Variant="Variant.Filled">Activo</MudChip>
-                }
-                else
-                {
-                    <MudChip T="string" Color="Color.Error" Variant="Variant.Filled">Inactivo</MudChip>
-                }
-            </MudTd>
-            <MudTd>@context.HireDate?.ToString("dd/MM/yyyy")</MudTd>
-            <MudTd>@context.Salary.ToString("C0")</MudTd>
-
-            <MudTd>
-                <MudTooltip Text="Editar">
-                    <MudButton Variant="Variant.Filled"
-                               Color="Color.Warning"
-                               OnClick="@(() => ShowModalAsync(context.Id, true))">
-                        <MudIcon Icon="@Icons.Material.Filled.Edit" />
-                    </MudButton>
-                </MudTooltip>
-
-                <MudTooltip Text="Borrar">
-                    <MudButton Variant="Variant.Filled"
-                               Color="Color.Error"
-                               OnClick="@(() => DeleteAsync(@context))">
-                        <MudIcon Icon="@Icons.Material.Filled.Delete" />
-                    </MudButton>
-                </MudTooltip>
-            </MudTd>
-        </RowTemplate>
-
-        <NoRecordsContent>
-            <MudText>No hay empleados registrados.</MudText>
-        </NoRecordsContent>
-
-        <PagerContent>
-            <MudTablePager RowsPerPageString="Registros por página"
-                           PageSizeOptions="pageSizeOptions"
-                           AllItemsText="Todos"
-                           InfoFormat="@infoFormat" />
-        </PagerContent>
-    </MudTable>
-}
+        </MudTd>
+        <MudTd>
+            <MudTooltip Text="Editar">
+                <MudButton Variant="Variant.Filled"
+                           Color="Color.Warning"
+                           OnClick="@(() => ShowModalAsync(context.Id, true))">
+                    <MudIcon Icon="@Icons.Material.Filled.Edit" />
+                </MudButton>
+            </MudTooltip>
+            <MudTooltip Text="Borrar">
+                <MudButton Variant="Variant.Filled"
+                           Color="Color.Error"
+                           OnClick="@(() => DeleteAsync(@context))">
+                    <MudIcon Icon="@Icons.Material.Filled.Delete" />
+                </MudButton>
+            </MudTooltip>
+        </MudTd>
+    </RowTemplate>
+    <NoRecordsContent>
+        <MudText>No hay registros</MudText>
+    </NoRecordsContent>
+    <LoadingContent>
+        <MudText>Cargando empleados...</MudText>
+    </LoadingContent>
+    <PagerContent>
+        <MudTablePager RowsPerPageString="Número de registros"
+                       PageSizeOptions="pageSizeOptions"
+                       AllItemsText="Todo"
+                       InfoFormat="@infoFormat" />
+    </PagerContent>
+</MudTable>
