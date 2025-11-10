@@ -13,12 +13,11 @@ public class Country : IEntityWithName
     public int Id { get; set; }
 
     [Display(Name = "País")]
-    [MaxLength(100, ErrorMessage = "El campo {0} no puede tener más de {1} caracteres.")]
+    [MaxLength(100, ErrorMessage = "El campo {0} no puede tener más de {1} carácteres.")]
     [Required(ErrorMessage = "El campo {0} es obligatorio.")]
     public string FirstName { get; set; } = null!;
 
     public ICollection<State>? States { get; set; }
 
-    [Display(Name = "Estados/Departamentos")]
-    public int StatesNumber => States == null || States.Count == 0 ? 0 : States.Count;
+    public int StatesNumber => States == null ? 0 : States.Count;
 }

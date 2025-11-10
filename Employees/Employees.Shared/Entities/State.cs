@@ -8,7 +8,7 @@ public class State : IEntityWithName
     public int Id { get; set; }
 
     [Display(Name = "Estado")]
-    [MaxLength(100, ErrorMessage = "El campo {0} no puede tener más de {1} caracteres.")]
+    [MaxLength(100, ErrorMessage = "El campo {0} no puede tener más de {1} carácteres.")]
     [Required(ErrorMessage = "El campo {0} es obligatorio.")]
     public string FirstName { get; set; } = null!;
 
@@ -18,6 +18,5 @@ public class State : IEntityWithName
 
     public ICollection<City>? Cities { get; set; }
 
-    [Display(Name = "Ciudades")]
-    public int CitiesNumber => Cities == null || Cities.Count == 0 ? 0 : Cities.Count;
+    public int CitiesNumber => Cities == null ? 0 : Cities.Count;
 }

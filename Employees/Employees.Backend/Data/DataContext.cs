@@ -22,8 +22,9 @@ public class DataContext : DbContext
         modelBuilder.Entity<City>().HasIndex(c => new { c.StateId, c.FirstName }).IsUnique();
         modelBuilder.Entity<Country>().HasIndex(c => c.FirstName).IsUnique();
         modelBuilder.Entity<Employee>().HasIndex(x => x.FirstName);
-        modelBuilder.Entity<Employee>().Property(x => x.Salary).HasColumnType("decimal(18,2)");
         modelBuilder.Entity<State>().HasIndex(s => new { s.CountryId, s.FirstName }).IsUnique();
+        modelBuilder.Entity<Employee>().Property(x => x.Salary).HasColumnType("decimal(18,2)");
+
         DisableCascadingDelete(modelBuilder);
     }
 

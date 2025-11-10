@@ -15,7 +15,7 @@ public class GenericRepository<T> : IGenericRepository<T> where T : class
     public GenericRepository(DataContext context)
     {
         _context = context;
-        _entity = _context.Set<T>();
+        _entity = context.Set<T>();
     }
 
     public virtual async Task<ActionResponse<IEnumerable<T>>> GetAsync(PaginationDTO pagination)
@@ -60,7 +60,7 @@ public class GenericRepository<T> : IGenericRepository<T> where T : class
         }
         catch (Exception exception)
         {
-            return ExceptionActionResponse(exception);
+            return ExceptionActionRespose(exception);
         }
     }
 
@@ -71,15 +71,26 @@ public class GenericRepository<T> : IGenericRepository<T> where T : class
         {
             return new ActionResponse<T>
             {
-                Message = "No se encontro el registro."
+                Message = "Registro no encontrado"
             };
         }
         _entity.Remove(row);
-        await _context.SaveChangesAsync();
-        return new ActionResponse<T>
+
+        try
         {
-            WasSuccess = true,
-        };
+            await _context.SaveChangesAsync();
+            return new ActionResponse<T>
+            {
+                WasSuccess = true
+            };
+        }
+        catch
+        {
+            return new ActionResponse<T>
+            {
+                Message = "No se puede borrar porque tiene registros relacionados."
+            };
+        }
     }
 
     public virtual async Task<ActionResponse<T>> GetAsync(int id)
@@ -89,7 +100,7 @@ public class GenericRepository<T> : IGenericRepository<T> where T : class
         {
             return new ActionResponse<T>
             {
-                Message = "No se encontro el registro."
+                Message = "Registro no encontrado"
             };
         }
         return new ActionResponse<T>
@@ -152,17 +163,17 @@ public class GenericRepository<T> : IGenericRepository<T> where T : class
         }
         catch (Exception exception)
         {
-            return ExceptionActionResponse(exception);
+            return ExceptionActionRespose(exception);
         }
     }
 
-    private ActionResponse<T> ExceptionActionResponse(Exception exception) => new ActionResponse<T>
+    private ActionResponse<T> ExceptionActionRespose(Exception exception) => new ActionResponse<T>
     {
         Message = exception.Message
     };
 
-    private ActionResponse<T> DbUpdateExceptionActionResponse()
+    private ActionResponse<T> DbUpdateExceptionActionResponse() => new ActionResponse<T>
     {
-        throw new NotImplementedException();
-    }
+        Message = "Ya existe el registro."
+    };
 }

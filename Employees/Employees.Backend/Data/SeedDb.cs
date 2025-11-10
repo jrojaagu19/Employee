@@ -14,9 +14,11 @@ public class SeedDb
 
     public async Task SeedAsync()
     {
+        //await _context.Database.MigrateAsync();
         await _context.Database.EnsureCreatedAsync();
 
         await CheckEmployeeFullAsync();
+        await CheckCountriesFullAsync();
         await CheckEmployeeAsync();
         await CheckCountriesAsync();
         await CheckCategoriesAsync();
@@ -32,6 +34,20 @@ public class SeedDb
             {
                 var employeesSQLScript = File.ReadAllText(sqlFilePath);
                 await _context.Database.ExecuteSqlRawAsync(employeesSQLScript);
+            }
+        }
+    }
+
+    private async Task CheckCountriesFullAsync()
+    {
+        if (!_context.Countries.Any())
+        {
+            var sqlFilePath = File.ReadAllText("Data\\CountriesStatesCities.sql");
+
+            if (File.Exists(sqlFilePath))
+            {
+                var countriesSQLScript = File.ReadAllText(sqlFilePath);
+                await _context.Database.ExecuteSqlRawAsync(countriesSQLScript);
             }
         }
     }
@@ -59,39 +75,93 @@ public class SeedDb
         }
     }
 
-    private async Task CheckCountriesAsync()
-    {
-        if (!_context.Countries.Any())
-        {
-            var countries = new List<Country>
-            {
-                new() { FirstName = "Colombia" },
-                new() { FirstName = "Estados Unidos" },
-                new() { FirstName = "México" },
-                new() { FirstName = "Argentina" },
-                new() { FirstName = "España" }
-            };
-
-            _context.Countries.AddRange(countries);
-            await _context.SaveChangesAsync();
-        }
-    }
-
     private async Task CheckCategoriesAsync()
     {
         if (!_context.Categories.Any())
         {
-            var categories = new List<Category>
-            {
-                new() { FirstName = "Calzado" },
-                new() { FirstName = "Tecnología" },
-                new() { FirstName = "Ropa" },
-                new() { FirstName = "Deportes" },
-                new() { FirstName = "Hogar" }
-            };
-
-            _context.Categories.AddRange(categories);
+            _context.Categories.Add(new Category { FirstName = "Apple" });
+            _context.Categories.Add(new Category { FirstName = "Autos" });
+            _context.Categories.Add(new Category { FirstName = "Belleza" });
+            _context.Categories.Add(new Category { FirstName = "Calzado" });
+            _context.Categories.Add(new Category { FirstName = "Comida" });
+            _context.Categories.Add(new Category { FirstName = "Cosmeticos" });
+            _context.Categories.Add(new Category { FirstName = "Deportes" });
+            _context.Categories.Add(new Category { FirstName = "Erótica" });
+            _context.Categories.Add(new Category { FirstName = "Ferreteria" });
+            _context.Categories.Add(new Category { FirstName = "Gamer" });
+            _context.Categories.Add(new Category { FirstName = "Hogar" });
+            _context.Categories.Add(new Category { FirstName = "Jardín" });
+            _context.Categories.Add(new Category { FirstName = "Jugetes" });
+            _context.Categories.Add(new Category { FirstName = "Lenceria" });
+            _context.Categories.Add(new Category { FirstName = "Mascotas" });
+            _context.Categories.Add(new Category { FirstName = "Nutrición" });
+            _context.Categories.Add(new Category { FirstName = "Ropa" });
+            _context.Categories.Add(new Category { FirstName = "Tecnología" });
             await _context.SaveChangesAsync();
         }
+    }
+
+    private async Task CheckCountriesAsync()
+    {
+        if (!_context.Countries.Any())
+        {
+            _context.Countries.Add(new Country
+            {
+                FirstName = "Colombia",
+                States = [
+                    new State()
+                    {
+                        FirstName = "Antioquia",
+                        Cities = [
+                            new City() { FirstName = "Medellín" },
+                            new City() { FirstName = "Itagüí" },
+                            new City() { FirstName = "Envigado" },
+                            new City() { FirstName = "Bello" },
+                            new City() { FirstName = "Rionegro" },
+                        ]
+                    },
+                    new State()
+                    {
+                        FirstName = "Bogotá",
+                        Cities = [
+                            new City() { FirstName = "Usaquen" },
+                            new City() { FirstName = "Champinero" },
+                            new City() { FirstName = "Santa fe" },
+                            new City() { FirstName = "Useme" },
+                            new City() { FirstName = "Bosa" },
+                        ]
+                    },
+                ]
+            });
+            _context.Countries.Add(new Country
+            {
+                FirstName = "Estados Unidos",
+                States = [
+                    new State()
+                {
+                    FirstName = "Florida",
+                    Cities = [
+                        new City() { FirstName = "Orlando" },
+                        new City() { FirstName = "Miami" },
+                        new City() { FirstName = "Tampa" },
+                        new City() { FirstName = "Fort Lauderdale" },
+                        new City() { FirstName = "Key West" },
+                    ]
+                },
+                new State()
+                    {
+                        FirstName = "Texas",
+                        Cities = [
+                            new City() { FirstName = "Houston" },
+                            new City() { FirstName = "San Antonio" },
+                            new City() { FirstName = "Dallas" },
+                            new City() { FirstName = "Austin" },
+                            new City() { FirstName = "El Paso" },
+                        ]
+                    },
+                ]
+            });
+        }
+        await _context.SaveChangesAsync();
     }
 }
