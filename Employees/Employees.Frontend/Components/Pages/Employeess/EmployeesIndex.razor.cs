@@ -1,6 +1,7 @@
 ﻿using Employees.Frontend.Components.Shared;
 using Employees.Frontend.Repositories;
 using Employees.Shared.Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
 using System;
@@ -8,6 +9,7 @@ using System.Net;
 
 namespace Employees.Frontend.Components.Pages.Employeess;
 
+[Authorize(Roles = "Admin")]
 public partial class EmployeesIndex
 {
     private MudTable<Employee>? table;

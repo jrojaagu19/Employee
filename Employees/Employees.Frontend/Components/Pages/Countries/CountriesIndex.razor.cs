@@ -4,9 +4,11 @@ using Employees.Shared.Entities;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
 using System.Net;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Employees.Frontend.Components.Pages.Countries;
 
+[Authorize(Roles = "Admin")]
 public partial class CountriesIndex
 {
     private List<Country>? Countries { get; set; }
