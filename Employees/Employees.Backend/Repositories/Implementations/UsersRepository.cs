@@ -1,5 +1,6 @@
 ﻿using Employees.Backend.Data;
 using Employees.Backend.Repositories.Interfaces;
+using Employees.Shared.DTOs;
 using Employees.Shared.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -11,12 +12,44 @@ public class UsersRepository : IUsersRepository
     private readonly DataContext _context;
     private readonly UserManager<User> _userManager;
     private readonly RoleManager<IdentityRole> _roleManager;
+    private readonly SignInManager<User> _signInManager;
 
-    public UsersRepository(DataContext context, UserManager<User> userManager, RoleManager<IdentityRole> roleManager)
+    public UsersRepository(DataContext context, UserManager<User> userManager, RoleManager<IdentityRole> roleManager, SignInManager<User> signInManager)
     {
         _context = context;
         _userManager = userManager;
         _roleManager = roleManager;
+        _signInManager = signInManager;
+    }
+
+    public async Task<User> GetUserAsync(Guid userId)
+    {
+        var user = await _context.Users
+            .Include(u => u.City!)
+            .ThenInclude(c => c.State!)
+            .ThenInclude(s => s.Country)
+            .FirstOrDefaultAsync(x => x.Id == userId.ToString());
+        return user!;
+    }
+
+    public async Task<IdentityResult> ChangePasswordAsync(User user, string currentPassword, string newPassword)
+    {
+        return await _userManager.ChangePasswordAsync(user, currentPassword, newPassword);
+    }
+
+    public async Task<IdentityResult> UpdateUserAsync(User user)
+    {
+        return await _userManager.UpdateAsync(user);
+    }
+
+    public async Task<SignInResult> LoginAsync(LoginDTO model)
+    {
+        return await _signInManager.PasswordSignInAsync(model.Email, model.Password, false, false);
+    }
+
+    public async Task LogoutAsync()
+    {
+        await _signInManager.SignOutAsync();
     }
 
     public async Task<IdentityResult> AddUserAsync(User user, string password)
